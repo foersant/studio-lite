@@ -1,19 +1,39 @@
-version: '3.7'
+version: '3'
 
 services:
-  studio-lite:
-    container_name: teststudio-lite
+  studio-lite-backend:
+    container_name: backend
+    image: studio-lite-backend:latest
     depends_on:
       - db
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./dockerfile.backend
+    links:
+      - db
+    ports:
+      - 3333:3333
+    volumes:
+      - .:/usr/src/app/studio-lite-backend/
+    networks:
+      - studio_network
+    
+  studio-lite-frontend:
+    container_name: frontend
+    image: studio-lite-frontend:latest
+    build:
+      context: .
+      dockerfile: ./dockerfile.frontend
+    depends_on:
+      - db
     links:
       - db
     ports:
       - 4200:4200
     volumes:
-      - .:/usr/src/app
+      - .:/usr/src/app/studio-lite-frontend/
+    networks:
+      - studio_network
 
   db:
     container_name: studio-lite-db
@@ -26,4 +46,25 @@ services:
       - database/docker.env
     volumes:
       - /data/postgres:/data/postgres
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sqlg
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - studio_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superdb -d studio-lite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  init:
+    image: studio-lite-backend:latest
+    depends_on:
+      - db
+      - studio-lite-backend
+    command: node database/insert_db_user.js
+    restart: on-failure
+    networks:
+      - studio_network
+  
+networks:
+  studio_network:
+    driver: bridge

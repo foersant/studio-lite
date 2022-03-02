@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const pool = new Pool({
   user: 'superdb',
-  host: 'localhost',
+  host: 'db',
   database: 'studio-lite',
   password: 'jfsdssfdfmsdp9fsumdpfu3094umt394u3',
   port: 5432,
