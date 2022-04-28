@@ -40,6 +40,7 @@ services:
     restart: always
     image: postgres
     hostname: postgres
+    user: postgres
     ports:
       - 5432:5432
     env_file:
@@ -50,7 +51,7 @@ services:
     networks:
       - studio_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U superdb -d studio-lite"]
+      test: /usr/bin/pg_isready
       interval: 5s
       timeout: 5s
       retries: 5

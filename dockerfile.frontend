@@ -2,7 +2,7 @@ FROM node:14.19-buster-slim
 WORKDIR /usr/src/app
 COPY package.json ./
 RUN npm install -g nx
-RUN npm install
+RUN npm install --silent
 COPY . .
 EXPOSE 4200
 CMD nx serve frontend --disableHostCheck --host 0.0.0.0
